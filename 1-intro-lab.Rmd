@@ -427,7 +427,7 @@ penguins[1:5,]
 
 If we try to access a data point that is out of bounds, R returns an error. 
 ```{r}
-#penguins[3,10]
+penguins[3,10]
 ```
 
 :::alert-info
@@ -437,7 +437,7 @@ Access the species information (column 1) for the 10th penguin in the dataset us
 :::
 
 ```{r, echo=F}
-
+penguins[10, 1]
 ```
 
 :::alert-info
@@ -446,7 +446,7 @@ Access the species information (column 1) for the 10th penguin in the dataset us
 Access rows 15 through 20 and columns 1 through 3 of the penguins dataset.
 :::
 ```{r, echo=F}
-
+penguins[c(15:20), c(1:3)]
 ```
 
 ### The `$` operator
@@ -482,7 +482,8 @@ Create a table showing the distribution of penguin sex by species. What do you n
 :::
 
 ```{r, echo=F}
-
+summary(penguins$sex)
+table(penguins$species, penguins$sex)
 ```
 
 ## NAs in R
@@ -699,7 +700,7 @@ The following code chunk would select the variables we need. Can you adapt it, s
 :::
 
 ```{r,, eval=F}
-dplyr::select(penguins, species, island, year)
+dplyr::select(penguins, -year)
 ```
 
 Good to know: To **drop** variables, use `-` before the variable name, i.e. select(penguins, -year) to drop the year column (select everything but the year column).
@@ -740,6 +741,12 @@ only_2009_chinstraps <- dplyr::filter(only_2009, species == "Chinstrap")
 only_2009_chinstraps_species_sex_year <- dplyr::select(only_2009_chinstraps, species, sex, year)
 final_df <- only_2009_chinstraps_species_sex_year
 final_df #to print it in our console
+
+penguins %>%
+  dplyr::filter(year == 2009) %>%
+  dplyr::filter(species == "Chinstrap") %>%
+  dplyr::select(species, sex, year)
+
 
 ```
 
@@ -798,6 +805,15 @@ Can you get the weight of the lightest penguin of each species? You can use `min
 :::
 
 ```{r,, eval=F}
+penguins %>%
+  dplyr::group_by(species) %>%
+  dplyr::summarise(lightestpenguin = min(body_mass_g, na.rm = T)) %>%
+  dplyr::ungroup()
+
+penguins %>%
+  dplyr::group_by(species, year) %>%
+  dplyr::summarise(lightestpenguin = min(body_mass_g, na.rm = T)) %>%
+  dplyr::ungroup()
 
 ```
 
@@ -826,6 +842,11 @@ Can you create a data frame arranged by body_mass_g of the penguins observed in 
 :::
 
 ```{r,, eval=F}
+dreampenguins <- penguins %>%
+  dplyr::filter(island == "Dream") %>%
+  dplyr::arrange(body_mass_g)
+
+summary(dreampenguins)
 
 ```
 
